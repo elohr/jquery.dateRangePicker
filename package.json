@@ -1,0 +1,21 @@
+{
+  "name": "jQuery.dateRangePicker",
+  "version": "1.0.0",
+  "description": "Date Range Picker is a jQuery plugin to easily create UI elements that simplify the selection of date ranges. It also works on mobile or touch enabled devices.",
+  "main": "jquery.dateRangePicker.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elohr/jquery.dateRangePicker"
+  },
+  "keywords": [
+    "jquery-plugin"
+  ],
+  "author": "Esteban Lohr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elohr/jquery.dateRangePicker/issues"
+  }
+}
