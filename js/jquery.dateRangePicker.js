@@ -196,7 +196,7 @@ function DateRangePicker(element, options) {
 						if(i < options.startDate.getMonth()) {
 							yearContainer.append('<div class="drp-month-empty">&nbsp;</div>');
 						} else {
-							yearContainer.append(d.createMonthElement(addingYear, i, options.monthShortNames[i]));
+							yearContainer.append(d.createMonthElement(addingYear, i + 1, options.monthShortNames[i]));
 							d.months.push(yearContainer.children(':last')[0]);
 							$(d.months[d.months.length - 1])
 								.on('mousedown touchstart', d.monthMouseDown)
@@ -208,7 +208,7 @@ function DateRangePicker(element, options) {
 
 				if(addingYear === endDateYear) {
 					for (var i = options.endDate.getMonth(); i >= 0; i--) {
-						yearContainer.prepend(d.createMonthElement(addingYear, i, options.monthShortNames[i]));
+						yearContainer.prepend(d.createMonthElement(addingYear, i + 1, options.monthShortNames[i]));
 						d.months.push(yearContainer.children(':first')[0]);
 						$(d.months[d.months.length - 1])
 							.on('mousedown touchstart', d.monthMouseDown)
@@ -219,7 +219,7 @@ function DateRangePicker(element, options) {
 
 				if(addingYear !== startDateYear && addingYear !== endDateYear) {
 					for (var i = 11; i >= 0; i--) {
-						yearContainer.prepend(d.createMonthElement(addingYear, i, options.monthShortNames[i]));
+						yearContainer.prepend(d.createMonthElement(addingYear, i + 1, options.monthShortNames[i]));
 						d.months.push(yearContainer.children(':first')[0]);
 						$(d.months[d.months.length - 1])
 							.on('mousedown touchstart', d.monthMouseDown)
@@ -322,22 +322,22 @@ function DateRangePicker(element, options) {
 
 			if($('.drp-hovering').length === 0) {
 				datePartsInitial = $('.drp-active:first').children(':first').attr('data-value').split('-');
-				date = new Date(datePartsInitial[0], datePartsInitial[1], datePartsInitial[2]);
+				date = new Date(datePartsInitial[0], parseInt(datePartsInitial[1]) - 1, datePartsInitial[2]);
 
 				if(date < options.startDate) {
 					datePartsInitial[0] = options.startDate.getFullYear();
-					datePartsInitial[1] = options.startDate.getMonth();
+					datePartsInitial[1] = options.startDate.getMonth() + 1;
 					datePartsInitial[2] = options.startDate.getDate();
 				}
 
 				d.fromDateSpan.text(d.parseToString(datePartsInitial[0] + '-' + datePartsInitial[1] + '-' + datePartsInitial[2]));
 
 				datePartsFinal = $('.drp-active:last').children(':last').attr('data-value').split('-');
-				date = new Date(datePartsFinal[0], datePartsFinal[1], 0);
+				date = new Date(datePartsFinal[0], parseInt(datePartsFinal[1]), 0);
 
 				if(date > options.endDate) {
 					datePartsFinal[0] = options.endDate.getFullYear();
-					datePartsFinal[1] = options.endDate.getMonth();
+					datePartsFinal[1] = options.endDate.getMonth() + 1;
 					datePartsFinal[2] = options.endDate.getDate();
 
 					d.toDateSpan.text(d.parseToString(datePartsFinal[0] + '-' + datePartsFinal[1] + '-' + datePartsFinal[2]));
@@ -518,7 +518,7 @@ function DateRangePicker(element, options) {
 			d.mainPopup.find('.drp-year-value').each(function() {
 				if($(this).text() == dateParts[0]) { // Year
 					$(this).nextAll('.drp-month').each(function() {
-						if($(this).text() == options.monthShortNames[parseInt(dateParts[1])]) { // Month
+						if($(this).text() == options.monthShortNames[parseInt(dateParts[1]) - 1]) { // Month
 							m = $(this);
 							return false;
 						}
@@ -535,7 +535,7 @@ function DateRangePicker(element, options) {
 			var datePartsInitial = d.parseToDate(d.fromDateSpan.text()).split('-'),
 				datePartsFinal = d.parseToDate(d.toDateSpan.text()).split('-');
 
-			if(d.toDateSpan.text() !== options.selectDateText && new Date(datePartsInitial[0], datePartsInitial[1], datePartsInitial[2]) > new Date(datePartsFinal[0], datePartsFinal[1], datePartsFinal[2])) {
+			if(d.toDateSpan.text() !== options.selectDateText && new Date(datePartsInitial[0], parseInt(datePartsInitial[1]) - 1, datePartsInitial[2]) > new Date(datePartsFinal[0], parseInt(datePartsFinal[1]) - 1, datePartsFinal[2])) {
 				d.fromDateSpan.text(options.selectDateText).removeClass('drp-hovering');
 				d.toDateSpan.text(options.selectDateText).removeClass('drp-hovering');
 				d.clearSelection();
@@ -549,9 +549,15 @@ function DateRangePicker(element, options) {
 
 		parseToString: function(date) {
 			var dateParts = date.split('-'),
-				dateForLastDay = new Date(dateParts[0], parseInt(dateParts[1]) + 1, parseInt(dateParts[2]));
+				m = parseInt(dateParts[1]),
+				d = parseInt(dateParts[2]),
+				dateForLastDay = new Date(dateParts[0], m - 1, d);
 
-			return options.monthShortNames[parseInt(dateParts[1])] + ' ' + dateForLastDay.getDate() + ', ' + dateParts[0]
+			if(d === 0) {
+				dateForLastDay = new Date(dateParts[0], m, d);
+			}
+
+			return options.monthShortNames[m - 1] + ' ' + dateForLastDay.getDate() + ', ' + dateParts[0];
 		},
 
 		checkDateRange: function(date) {
@@ -576,7 +582,7 @@ function DateRangePicker(element, options) {
 				// Month
 				for (var i = options.monthShortNames.length - 1; i >= 0; i--) {
 					if(dateParts[0].startsWith(options.monthShortNames[i])) {
-						month = i;
+						month = i + 1;
 						break;
 					}
 				}
@@ -590,7 +596,7 @@ function DateRangePicker(element, options) {
 				// Month
 				for (var i = options.monthShortNames.length - 1; i >= 0; i--) {
 					if(dateParts[0].startsWith(options.monthShortNames[i])) {
-						month = i;
+						month = i + 1;
 						break;
 					}
 				}
@@ -611,7 +617,7 @@ function DateRangePicker(element, options) {
 
 				if(date.isValidDate()) {
 					year = date.getFullYear();
-					month = date.getMonth();
+					month = date.getMonth() + 1;
 					day = date.getDate();
 				} else {
 					// Parse things as today, tomorrow, yesterday, (days of week), (month names)
@@ -619,22 +625,22 @@ function DateRangePicker(element, options) {
 
 					if(options.today.toLowerCase().startsWith(dateParts[0].toLowerCase())) {
 						year = date.getFullYear();
-						month = date.getMonth();
+						month = date.getMonth() + 1;
 						day = date.getDate();
 					} else if(options.tomorrow.toLowerCase().startsWith(dateParts[0].toLowerCase())) {
 						date = date.addDays(1);
 						year = date.getFullYear();
-						month = date.getMonth();
+						month = date.getMonth() + 1;
 						day = date.getDate();
 					} else if(options.yesterday.toLowerCase().startsWith(dateParts[0].toLowerCase())) {
 						date = date.addDays(-1);
 						year = date.getFullYear();
-						month = date.getMonth();
+						month = date.getMonth() + 1;
 						day = date.getDate();
 					} else { // check days of week and then month names
 						for (var i = options.dayLongNames.length - 1; i >= 0; i--) {
 							if(options.dayLongNames[i].toLowerCase().startsWith(dateParts[0].toLowerCase())) {
-								weekDayNum = i - 1;
+								weekDayNum = i;
 								break;
 							}
 						}
@@ -647,7 +653,7 @@ function DateRangePicker(element, options) {
 							}
 
 							year = date.getFullYear();
-							month = date.getMonth();
+							month = date.getMonth() + 1;
 							day = date.getDate();
 						} else {
 							for (var i = options.monthLongNames.length - 1; i >= 0; i--) {
@@ -665,7 +671,7 @@ function DateRangePicker(element, options) {
 								}
 
 								year = date.getFullYear();
-								month = date.getMonth();
+								month = date.getMonth() + 1;
 								if(showLastDayOfMonth) {
 									dateForLastDay = new Date(year, month, 0);
 									day = dateForLastDay.getDate();
@@ -680,11 +686,12 @@ function DateRangePicker(element, options) {
 
 			if(year !== undefined) {
 				returnString = year + '-' + month + '-' + day;
+				console.log(returnString);
 				date = new Date(returnString);
 
 				if(d.checkDateRange(date) !== date) {
 					date = d.checkDateRange(date);
-					returnString = date.getFullYear() + '-' + (date.getMonth()) + '-' + date.getDate();
+					returnString = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 				}
 
 				if(date.isValidDate()) {
@@ -772,15 +779,15 @@ function DateRangePicker(element, options) {
 				date = d.checkDateRange(date);
 
 				for (var i = d.months.length - 1; i >= 0; i--) {
-					if($(d.months[i]).attr('data-value') === date.getFullYear() + '-' + (date.getMonth()) + '-1') {
+					if($(d.months[i]).attr('data-value') === date.getFullYear() + '-' + (date.getMonth() + 1) + '-1') {
 						d.makeSelection($(d.months[i]), $(d.months[i]));
 						$(d.months[i]).children(':first').children().addClass('drp-exclude');
 						break;
 					}
 				}
 
-				d.fromDateSpan.text(d.parseToString(date.getFullYear() + '-' + (date.getMonth()) + '-' + date.getDate()));
-				d.toDateSpan.text(d.parseToString(date.getFullYear() + '-' + (date.getMonth()) + '-' + date.getDate()));
+				d.fromDateSpan.text(d.parseToString(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()));
+				d.toDateSpan.text(d.parseToString(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()));
 			} else if(text === options.thisWeek) {
 				date = date.addDays(-date.getDay());
 
@@ -791,7 +798,7 @@ function DateRangePicker(element, options) {
 				date = d.checkDateRange(date);
 
 				for (var i = d.months.length - 1; i >= 0; i--) {
-					if($(d.months[i]).attr('data-value') === date.getFullYear() + '-' + (date.getMonth()) + '-1') {
+					if($(d.months[i]).attr('data-value') === date.getFullYear() + '-' + (date.getMonth() + 1) + '-1') {
 						start = $(d.months[i]);
 						break;
 					}
@@ -806,7 +813,7 @@ function DateRangePicker(element, options) {
 				date = d.checkDateRange(date);
 
 				for (var i = d.months.length - 1; i >= 0; i--) {
-					if($(d.months[i]).attr('data-value') === date.getFullYear() + '-' + (date.getMonth()) + '-1') {
+					if($(d.months[i]).attr('data-value') === date.getFullYear() + '-' + (date.getMonth() + 1) + '-1') {
 						end = $(d.months[i]);
 						break;
 					}
@@ -823,7 +830,7 @@ function DateRangePicker(element, options) {
 
 				date = d.checkDateRange(date);
 
-				d.fromDateSpan.text(d.parseToString(date.getFullYear() + '-' + (date.getMonth()) + '-' + date.getDate()));
+				d.fromDateSpan.text(d.parseToString(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()));
 
 				d.excludeMonthPartsFromStartDate(date.getDate());
 
@@ -837,12 +844,12 @@ function DateRangePicker(element, options) {
 
 				date = d.checkDateRange(date);
 
-				d.toDateSpan.text(d.parseToString(date.getFullYear() + '-' + (date.getMonth()) + '-' + date.getDate()));
+				d.toDateSpan.text(d.parseToString(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()));
 
 				d.excludeMonthPartsFromEndDate(date.getDate());
 			} else if(text === options.thisMonth) {
 				for (var i = d.months.length - 1; i >= 0; i--) {
-					if($(d.months[i]).attr('data-value') === date.getFullYear() + '-' + (date.getMonth()) + '-1') {
+					if($(d.months[i]).attr('data-value') === date.getFullYear() + '-' + (date.getMonth() + 1) + '-1') {
 						d.makeSelection($(d.months[i]), $(d.months[i]));
 						break;
 					}
