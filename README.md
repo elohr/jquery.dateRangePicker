@@ -30,4 +30,4 @@ $('#calendar-1').DateRangePicker({
 ```
 
 ## Examples, Demo and Documentation
-For more examples and documentation go to [elohr.me](http://elohr.me/)
+For more examples and documentation go to [elohr.me](http://elohr.me/jquery-date-range-picker.html)
